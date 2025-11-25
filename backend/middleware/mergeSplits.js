@@ -5,8 +5,8 @@ const enc = get_encoding("cl100k_base");
 export const mergeSplits = ({
   splits,
   separator = " ",
-  chunkSize = 4000,
-  chunkOverlap = 200,
+  chunkSize = 200,
+  chunkOverlap = 0,
   lengthFn = (text) => {
     const tokenIds = enc.encode(text);
     return tokenIds.length;

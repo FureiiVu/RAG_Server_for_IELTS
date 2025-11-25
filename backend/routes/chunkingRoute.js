@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { uploadDocument } from "../controllers/chunkingController.js";
+import {
+  uploadDocument,
+  handleRecursiveTokenChunker,
+} from "../controllers/chunkingController.js";
 
 const router = Router();
 
 router.post("/upload-document", uploadDocument);
+router.post("/recursive-token-chunker", handleRecursiveTokenChunker);
 
 export default router;
