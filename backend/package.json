@@ -25,6 +25,7 @@
     "pdfjs-dist": "^5.4.394",
     "tesseract.js": "^6.0.1",
     "tiktoken": "^1.0.22",
-    "validator": "^13.15.23"
+    "validator": "^13.15.23",
+    "weaviate-client": "^3.9.0"
   }
 }
