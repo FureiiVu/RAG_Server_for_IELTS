@@ -3,6 +3,11 @@ import path from "path";
 
 import { normalizeDocument } from "../middleware/normalizeDocument.js";
 import { RecursiveTokenChunker } from "../chunking_strategies/recursiveTokenChunker.js";
+import {
+  insertChunksToWeaviate,
+  fetchAllChunksFromCollection,
+} from "../middleware/crudWeaviate.js";
+import { ClusterSemanticChunker } from "../chunking_strategies/clusterSemanticChunker.js";
 
 export const uploadDocument = async (req, res) => {
   try {
@@ -89,20 +94,27 @@ export const handleRecursiveTokenChunker = async (req, res) => {
 
     // Thực hiện chunking theo kỹ thuật Recursive Token Chunker
     const chunks = chunker.splitText(dataContent);
-
     console.log(
       `[CHUNKING] Finished Recursive Token Chunker for file: ${requestedFileName}`
+    );
+
+    const chunksObjects = chunks.map((chunk, index) => ({
+      content: chunk,
+      metadata: { source: requestedFileName, chunkIndex: index },
+    }));
+    const uuids = await insertChunksToWeaviate("TempCollection", chunksObjects);
+
+    // Xóa file sau khi chunking xong (nếu cần)
+    await fs.promises.unlink(dataFilePath);
+    console.log(
+      `[CLEANUP] Deleted normalized file: ${requestedFileName} after chunking`
     );
 
     res.status(200).json({
       message: "Chunking completed",
       fileName: requestedFileName,
       chunkCount: chunks.length,
-      chunksPreview: chunks.map((c, i) => ({
-        index: i,
-        length: c.length,
-        preview: c.slice(0, 120) + (c.length > 120 ? "..." : ""),
-      })),
+      chunksUUIDS: uuids,
     });
   } catch (err) {
     console.error(
@@ -111,6 +123,35 @@ export const handleRecursiveTokenChunker = async (req, res) => {
     res.status(500).json({
       api: "Handle Recursive Token Chunker",
       error: err.message,
+    });
+  }
+};
+
+export const handleClusterSemanticChunker = async (req, res) => {
+  try {
+    const { miniChunksContent, miniChunksVectors } =
+      await fetchAllChunksFromCollection("TempCollection");
+
+    const cluster = new ClusterSemanticChunker({
+      contents: miniChunksContent,
+      vectors: miniChunksVectors,
+    });
+
+    console.log(`[CHUNKING] Vectors: `, miniChunksVectors);
+
+    const semanticChunks = cluster.build();
+
+    res.status(200).json({
+      message: "Cluster Semantic Chunker handled successfully",
+      chunks: semanticChunks,
+    });
+  } catch (error) {
+    console.error(
+      `[ERROR] Unable to handle cluster semantic chunker: ${error.message}`
+    );
+    res.status(500).json({
+      api: "Handle Cluster Semantic Chunker",
+      error: error.message,
     });
   }
 };

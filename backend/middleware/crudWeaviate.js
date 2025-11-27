@@ -7,7 +7,7 @@ export const insertChunksToWeaviate = async (collectionName, chunkData) => {
     const collection = weaviateClient.collections.get(collectionName);
 
     // Chèn nhiều chunk vào collection
-    console.log("[INFO] Inserting chunk to Weaviate:", chunkData);
+    console.log("[INFO] Inserting chunk to Weaviate");
     const response = await collection.data.insertMany(chunkData);
     console.log("[INFO] Chunk inserted successfully");
 
@@ -35,9 +35,51 @@ export const fetchChunkVectorByUUID = async (collectionName, uuid) => {
     return response?.vectors.default;
   } catch (error) {
     console.error(
-      "[ERROR] Error fetching chunk vector by UUID from Weaviate:",
+      "[ERROR] Error fetching chunk vector by UUID from Weaviate",
       error
     );
+    throw error;
+  }
+};
+
+export const fetchAllChunksFromCollection = async (collectionName) => {
+  try {
+    // Lấy collection từ Weaviate dựa trên tên collection
+    const collection = weaviateClient.collections.use(collectionName);
+    const allChunksText = [];
+    const allChunksVectors = [];
+
+    console.log(
+      "[INFO] Fetching all chunks from Weaviate collection:",
+      collectionName
+    );
+
+    for await (let item of collection.iterator({
+      includeVector: true,
+    })) {
+      allChunksText.push(item.properties.content);
+      allChunksVectors.push(item.vectors.default);
+    }
+
+    console.log("[INFO] All chunks fetched successfully");
+
+    return {
+      miniChunksContent: allChunksText,
+      miniChunksVectors: allChunksVectors,
+    };
+  } catch (error) {
+    console.error("[ERROR] Error fetching all chunks from Weaviate", error);
+    throw error;
+  }
+};
+
+export const deleteCollection = async (collectionName) => {
+  try {
+    // Lấy collection từ Weaviate dựa trên tên collection
+    await weaviateClient.collections.delete(collectionName);
+    console.log(`[INFO] Collection ${collectionName} deleted successfully`);
+  } catch (error) {
+    console.error("[ERROR] Error deleting collection in Weaviate:", error);
     throw error;
   }
 };
