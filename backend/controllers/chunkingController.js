@@ -98,6 +98,7 @@ export const handleRecursiveTokenChunker = async (req, res) => {
       `[CHUNKING] Finished Recursive Token Chunker for file: ${requestedFileName}`
     );
 
+    // Chèn các chunk vào Weaviate trong collection tạm thời "TempCollection"
     const chunksObjects = chunks.map((chunk, index) => ({
       content: chunk,
       metadata: { source: requestedFileName, chunkIndex: index },
@@ -129,17 +130,21 @@ export const handleRecursiveTokenChunker = async (req, res) => {
 
 export const handleClusterSemanticChunker = async (req, res) => {
   try {
+    // Lấy tất cả mini-chunks từ collection tạm thời "TempCollection"
     const { miniChunksContent, miniChunksVectors } =
       await fetchAllChunksFromCollection("TempCollection");
 
+    // Khởi tạo ClusterSemanticChunker với cấu hình mong muốn
     const cluster = new ClusterSemanticChunker({
-      contents: miniChunksContent,
-      vectors: miniChunksVectors,
+      maxClusterSize: 5,
+      linkage: "complete",
     });
 
-    console.log(`[CHUNKING] Vectors: `, miniChunksVectors);
-
-    const semanticChunks = cluster.build();
+    // Thực hiện clustering các mini-chunks
+    const semanticChunks = cluster.cluster(
+      miniChunksContent,
+      miniChunksVectors
+    );
 
     res.status(200).json({
       message: "Cluster Semantic Chunker handled successfully",
