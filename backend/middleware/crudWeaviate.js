@@ -83,3 +83,16 @@ export const deleteCollection = async (collectionName) => {
     throw error;
   }
 };
+
+export const checkCollectionExists = async (collectionName) => {
+  try {
+    const result = await weaviateClient.collections.exists(collectionName);
+    return result;
+  } catch (error) {
+    console.error(
+      "[ERROR] Error checking collection exists in Weaviate:",
+      error
+    );
+    throw error;
+  }
+};

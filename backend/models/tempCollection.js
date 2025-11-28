@@ -13,6 +13,7 @@ const createTempCollection = async () => {
     console.log("[INFO] TempCollection created successfully");
   } catch (error) {
     console.error("[ERROR] Error creating TempCollection:", error);
+    throw error;
   }
 };
 

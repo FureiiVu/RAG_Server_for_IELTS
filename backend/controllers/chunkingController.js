@@ -3,11 +3,15 @@ import path from "path";
 
 import { normalizeDocument } from "../middleware/normalizeDocument.js";
 import { RecursiveTokenChunker } from "../chunking_strategies/recursiveTokenChunker.js";
+import { ClusterSemanticChunker } from "../chunking_strategies/clusterSemanticChunker.js";
 import {
   insertChunksToWeaviate,
   fetchAllChunksFromCollection,
+  checkCollectionExists,
+  deleteCollection,
 } from "../middleware/crudWeaviate.js";
-import { ClusterSemanticChunker } from "../chunking_strategies/clusterSemanticChunker.js";
+import createTempCollection from "../models/tempCollection.js";
+import createFinalChunksCollection from "../models/finalChunksCollection.js";
 
 export const uploadDocument = async (req, res) => {
   try {
@@ -98,10 +102,15 @@ export const handleRecursiveTokenChunker = async (req, res) => {
       `[CHUNKING] Finished Recursive Token Chunker for file: ${requestedFileName}`
     );
 
+    // Kiểm tra và tạo collection tạm thời "TempCollection" nếu chưa tồn tại
+    const collectionExists = await checkCollectionExists("TempCollection");
+    if (!collectionExists) {
+      await createTempCollection();
+    }
+
     // Chèn các chunk vào Weaviate trong collection tạm thời "TempCollection"
     const chunksObjects = chunks.map((chunk, index) => ({
       content: chunk,
-      metadata: { source: requestedFileName, chunkIndex: index },
     }));
     const uuids = await insertChunksToWeaviate("TempCollection", chunksObjects);
 
@@ -130,6 +139,15 @@ export const handleRecursiveTokenChunker = async (req, res) => {
 
 export const handleClusterSemanticChunker = async (req, res) => {
   try {
+    // Kiểm tra collection tạm thời "TempCollection" có tồn tại không
+    const collectionExists = await checkCollectionExists("TempCollection");
+    if (!collectionExists) {
+      return res.status(400).json({
+        api: "Handle Cluster Semantic Chunker",
+        error: "Temporary collection 'TempCollection' does not exist",
+      });
+    }
+
     // Lấy tất cả mini-chunks từ collection tạm thời "TempCollection"
     const { miniChunksContent, miniChunksVectors } =
       await fetchAllChunksFromCollection("TempCollection");
@@ -146,9 +164,34 @@ export const handleClusterSemanticChunker = async (req, res) => {
       miniChunksVectors
     );
 
+    // Gom các chunk đã được cluster thành các objects để chèn vào Weaviate
+    const clusteredChunksObjects = semanticChunks.map((chunkGroup, index) => ({
+      content: chunkGroup.chunks.join("\n\n"),
+    }));
+
+    // Kiểm tra và tạo collection "FinalChunksCollection" nếu chưa tồn tại
+    const finalChunksCollectionExists = await checkCollectionExists(
+      "FinalChunksCollection"
+    );
+    if (!finalChunksCollectionExists) {
+      await createFinalChunksCollection();
+    }
+
+    // Chèn các clustered chunks vào Weaviate trong collection "FinalChunksCollection"
+    const uuids = await insertChunksToWeaviate(
+      "FinalChunksCollection",
+      clusteredChunksObjects
+    );
+
+    // Xóa collection tạm thời "TempCollection" sau khi hoàn thành clustering
+    await deleteCollection("TempCollection");
+    console.log(
+      `[CLEANUP] Deleted temporary collection: TempCollection after clustering`
+    );
+
     res.status(200).json({
       message: "Cluster Semantic Chunker handled successfully",
-      chunks: semanticChunks,
+      chunksUUIDS: uuids,
     });
   } catch (error) {
     console.error(

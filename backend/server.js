@@ -6,6 +6,7 @@ import fileUpload from "express-fileupload";
 import cron from "node-cron";
 
 import chunkingRoute from "./routes/chunkingRoute.js";
+import retrievalRoute from "./routes/retrievalRoute.js";
 import { cleanTempDirectory } from "./middleware/cleanTempDirectory.js";
 
 // load env vars
@@ -43,6 +44,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/rag/chunking", chunkingRoute);
+app.use("/rag/retrieval", retrievalRoute);
 
 // run server
 app.listen(port, () => {
