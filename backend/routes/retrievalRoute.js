@@ -1,9 +1,9 @@
 import { Router } from "express";
 
-import { handleTestRetrieval } from "../controllers/retrievalController.js";
+import { handleRetrievalAndSendRequest } from "../controllers/retrievalController.js";
 
 const router = Router();
 
-router.post("/test-retrieval", handleTestRetrieval);
+router.post("/retrieval-send-request", handleRetrievalAndSendRequest);
 
 export default router;

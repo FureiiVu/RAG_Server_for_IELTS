@@ -121,8 +121,7 @@ export const handleRecursiveTokenChunker = async (req, res) => {
     );
 
     res.status(200).json({
-      message: "Chunking completed",
-      fileName: requestedFileName,
+      message: "Recursive Token Chunking completed",
       chunkCount: chunks.length,
       chunksUUIDS: uuids,
     });
@@ -191,7 +190,8 @@ export const handleClusterSemanticChunker = async (req, res) => {
 
     res.status(200).json({
       message: "Cluster Semantic Chunker handled successfully",
-      chunksUUIDS: uuids,
+      clusterCount: semanticChunks.length,
+      clustersUUIDS: uuids,
     });
   } catch (error) {
     console.error(

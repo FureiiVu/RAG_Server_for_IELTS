@@ -5,17 +5,15 @@ import weaviateClient from "../config/connectDB.js";
 
 dotenv.config();
 
-export const handleTestRetrieval = async (req, res) => {
+export const handleRetrievalAndSendRequest = async (req, res) => {
   try {
     const { question } = req.body;
 
-    // 1. Retrieval
+    // 1. Retrieval 5 nearest chunks từ Weaviate
     const finalChunks = weaviateClient.collections.get("FinalChunksCollection");
     const retrieved = await finalChunks.query.nearText("What is RAG?", {
       limit: 5,
     });
-
-    console.log("Retrieved objects:", retrieved.objects);
 
     const contexts = retrieved.objects
       .map((obj) => obj.properties.content)
@@ -40,8 +38,8 @@ export const handleTestRetrieval = async (req, res) => {
     });
 
     res.json({
+      message: "Retrieval and request handling completed successfully",
       answer: response.text,
-      retrieved_chunks: contexts,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
