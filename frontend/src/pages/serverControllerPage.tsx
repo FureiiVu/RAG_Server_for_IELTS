@@ -1,7 +1,11 @@
+import { FileUploadInput } from "@/components/cards/fileUploadInput";
+
 const ServerControllerPage = () => {
   return (
     <>
-      <h1>Server Controller Page</h1>
+      <div className="w-full max-w-[60%] mx-auto my-2.5 border p-4 rounded-sm">
+        <FileUploadInput />
+      </div>
     </>
   );
 };
