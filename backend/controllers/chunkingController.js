@@ -51,6 +51,7 @@ export const uploadDocument = async (req, res) => {
       message: "Document uploaded and normalized successfully",
       originalFileName: document.name,
       normalizedFileName: outputFileName,
+      normalizedContent: normalizedContent,
     });
   } catch (err) {
     console.error(

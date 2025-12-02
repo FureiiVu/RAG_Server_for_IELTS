@@ -4,17 +4,22 @@ import { create } from "zustand";
 interface documentStore {
   message: string;
   documentName: string;
-  normalizeDocumentName: string;
+  normalizedDocumentName: string;
+  normalizedContent: string;
   isLoading: boolean;
+  isCompleted: boolean;
   error: string | null;
   uploadDocument: (document: File) => Promise<void>;
+  cleanStore: () => void;
 }
 
 export const useDocumentStore = create<documentStore>((set) => ({
   message: "",
   documentName: "",
-  normalizeDocumentName: "",
+  normalizedDocumentName: "",
+  normalizedContent: "",
   isLoading: false,
+  isCompleted: false,
   error: null,
 
   uploadDocument: async (document: File) => {
@@ -44,12 +49,26 @@ export const useDocumentStore = create<documentStore>((set) => ({
       set({
         message: response.data.message,
         documentName: response.data.originalFileName,
-        normalizeDocumentName: response.data.normalizedFileName,
+        normalizedDocumentName: response.data.normalizedFileName,
+        normalizedContent: response.data.normalizedContent,
+        isCompleted: true,
       });
     } catch (error: any) {
       set({ error: error.response?.data?.message || "Upload failed" });
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  cleanStore: () => {
+    set({
+      message: "",
+      documentName: "",
+      normalizedDocumentName: "",
+      normalizedContent: "",
+      isLoading: false,
+      isCompleted: false,
+      error: null,
+    });
   },
 }));
