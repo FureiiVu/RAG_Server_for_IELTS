@@ -9,8 +9,16 @@ import { Loader2, Check, AlertCircle } from "lucide-react";
 export const FileUploadInput = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { isLoading, isCompleted, error, normalizedContent, uploadDocument } =
-    useDocumentStore();
+  const {
+    isLoading,
+    isCompleted,
+    error,
+    normalizedContent,
+    message,
+    documentName,
+    normalizedDocumentName,
+    uploadDocument,
+  } = useDocumentStore();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] || null;
@@ -71,7 +79,7 @@ export const FileUploadInput = () => {
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              key="details"
+              key="document-upload-details"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -87,22 +95,22 @@ export const FileUploadInput = () => {
                 ) : (
                   <>
                     <h3 className="font-semibold mb-2">Document Information</h3>
-                    {file ? (
+                    {normalizedDocumentName && documentName && message ? (
                       <div className="text-sm text-zinc-700 space-y-1">
                         <p>
-                          <strong>File name:</strong> {file.name}
+                          <strong>File name:</strong> {documentName}
                         </p>
                         <p>
-                          <strong>Size:</strong> {(file.size / 1024).toFixed(1)}{" "}
-                          KB
+                          <strong>Normalized file name:</strong>{" "}
+                          {normalizedDocumentName}
                         </p>
                         <p>
-                          <strong>Type:</strong> {file.type}
+                          <strong>Response message:</strong> {message}
                         </p>
                       </div>
                     ) : (
                       <p className="text-sm text-zinc-500 italic">
-                        No file selected yet.
+                        No file uploaded yet.
                       </p>
                     )}
                   </>

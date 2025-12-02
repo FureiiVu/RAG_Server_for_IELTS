@@ -1,5 +1,6 @@
 import { axiosInstance } from "@/lib/axios";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface documentStore {
   message: string;
@@ -13,55 +14,9 @@ interface documentStore {
   cleanStore: () => void;
 }
 
-export const useDocumentStore = create<documentStore>((set) => ({
-  message: "",
-  documentName: "",
-  normalizedDocumentName: "",
-  normalizedContent: "",
-  isLoading: false,
-  isCompleted: false,
-  error: null,
-
-  uploadDocument: async (document: File) => {
-    // Sửa isLoading thành true khi bắt đầu tải lên
-    set({ isLoading: true, error: null });
-
-    if (!document) {
-      set({ isLoading: false, error: "No document provided" });
-      return;
-    }
-
-    try {
-      // Gửi yêu cầu tải lên tài liệu
-      const response = await axiosInstance.post(
-        "chunking/upload-document",
-        {
-          document,
-        },
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      // Cập nhật trạng thái với phản hồi từ server
-      set({
-        message: response.data.message,
-        documentName: response.data.originalFileName,
-        normalizedDocumentName: response.data.normalizedFileName,
-        normalizedContent: response.data.normalizedContent,
-        isCompleted: true,
-      });
-    } catch (error: any) {
-      set({ error: error.response?.data?.message || "Upload failed" });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  cleanStore: () => {
-    set({
+export const useDocumentStore = create<documentStore>()(
+  persist(
+    (set) => ({
       message: "",
       documentName: "",
       normalizedDocumentName: "",
@@ -69,6 +24,61 @@ export const useDocumentStore = create<documentStore>((set) => ({
       isLoading: false,
       isCompleted: false,
       error: null,
-    });
-  },
-}));
+
+      uploadDocument: async (document: File) => {
+        set({ isLoading: true, error: null });
+
+        if (!document) {
+          set({ isLoading: false, error: "No document provided" });
+          return;
+        }
+
+        try {
+          const response = await axiosInstance.post(
+            "chunking/upload-document",
+            { document },
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          );
+
+          set({
+            message: response.data.message,
+            documentName: response.data.originalFileName,
+            normalizedDocumentName: response.data.normalizedFileName,
+            normalizedContent: response.data.normalizedContent,
+            isCompleted: true,
+          });
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.message || "Upload failed",
+          });
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      cleanStore: () => {
+        set({
+          message: "",
+          documentName: "",
+          normalizedDocumentName: "",
+          normalizedContent: "",
+          isLoading: false,
+          isCompleted: false,
+          error: null,
+        });
+      },
+    }),
+    {
+      name: "document-store",
+      partialize: (state: any) => ({
+        message: state.message,
+        documentName: state.documentName,
+        normalizedDocumentName: state.normalizedDocumentName,
+        normalizedContent: state.normalizedContent,
+        isCompleted: state.isCompleted,
+      }),
+    }
+  )
+);
