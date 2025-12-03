@@ -37,3 +37,24 @@ export const handleRetrievalAndSendRequest = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const handleGetClusterContents = async (req, res) => {
+  try {
+    const { clusterId } = req.body;
+
+    // Validate input
+    if (!clusterId) {
+      return res.status(400).json({ error: "clusterId is required" });
+    }
+
+    const finalChunks = weaviateClient.collections.get("FinalChunksCollection");
+    const retrieved = await finalChunks.query.fetchObjectById(clusterId);
+
+    res.json({
+      message: "Get cluster contents successfully",
+      clusterContent: retrieved.properties.content,
+    });
+  } catch (error) {
+    res.status(500).json({ error: err.message });
+  }
+};
