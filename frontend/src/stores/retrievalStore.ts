@@ -68,7 +68,6 @@ export const useRetrievalStore = create<retrievalStore>()(
     {
       name: "retrieval-store",
       partialize: (state: any) => ({
-        message: state.message,
         clusterContent: state.clusterContent,
         isCompleted: state.isCompleted,
       }),

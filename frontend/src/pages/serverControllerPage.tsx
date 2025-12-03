@@ -1,6 +1,7 @@
 import { FileUploadInput } from "@/components/cards/fileUploadInput";
 import { DocumentChunkingCard } from "@/components/cards/documentChunking";
 import { GetClusterContentCard } from "@/components/cards/getClusterContent";
+import { DeleteClustersCard } from "@/components/cards/deleteClusters";
 import { Button } from "@/components/ui/button";
 
 import { useDocumentStore } from "@/stores/documentStore";
@@ -35,6 +36,7 @@ const ServerControllerPage = () => {
       <FileUploadInput />
       <DocumentChunkingCard />
       <GetClusterContentCard />
+      <DeleteClustersCard />
 
       <div className="w-full max-w-[60%] mx-auto my-2.5 flex justify-end space-x-2.5">
         <Button variant="secondary" className="px-8" onClick={cleanAllStores}>
