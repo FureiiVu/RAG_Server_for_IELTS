@@ -4,8 +4,8 @@ import { persist } from "zustand/middleware";
 
 interface documentStore {
   message: string;
-  chunkCount: number;
-  chunksUUIDs: string[];
+  clusterCount: number;
+  clustersUUIDs: string[];
   isLoading: boolean;
   isCompleted: boolean;
   error: string | null;
@@ -17,30 +17,27 @@ export const useClusterSemanticChunkingStore = create<documentStore>()(
   persist(
     (set) => ({
       message: "",
-      chunkCount: 0,
-      chunksUUIDs: [],
+      clusterCount: 0,
+      clustersUUIDs: [],
       isLoading: false,
       isCompleted: false,
       error: null,
 
-      initiateCscChunking: async (normalizedDocumentName: string) => {
+      initiateCscChunking: async () => {
         set({ isLoading: true, error: null });
-
-        if (!normalizedDocumentName) {
-          set({ isLoading: false, error: "No document name provided" });
-          return;
-        }
 
         try {
           // Gửi yêu cầu chunking tài liệu bằng Recursive Token Chunker
           const cscResponse = await axiosInstance.post(
-            "chunking/recursive-token-chunker"
+            "chunking/cluster-semantic-chunker"
           );
+
+          const clustersUUIDs = cscResponse.data?.clustersUUIDS ?? {};
 
           set({
             message: cscResponse.data.message,
-            chunkCount: cscResponse.data.chunkCount,
-            chunksUUIDs: cscResponse.data.chunksUUIDs,
+            clusterCount: cscResponse.data.clusterCount,
+            clustersUUIDs: Object.values(clustersUUIDs),
             isCompleted: true,
           });
         } catch (error: any) {
@@ -57,8 +54,8 @@ export const useClusterSemanticChunkingStore = create<documentStore>()(
       cleanStore: () => {
         set({
           message: "",
-          chunkCount: 0,
-          chunksUUIDs: [],
+          clusterCount: 0,
+          clustersUUIDs: [],
           isLoading: false,
           isCompleted: false,
           error: null,
@@ -66,11 +63,11 @@ export const useClusterSemanticChunkingStore = create<documentStore>()(
       },
     }),
     {
-      name: "recursive-token-chunking-store",
+      name: "cluster-semantic-chunking-store",
       partialize: (state: any) => ({
         message: state.message,
-        chunkCount: state.chunkCount,
-        chunksUUIDs: state.chunksUUIDs,
+        clusterCount: state.clusterCount,
+        clustersUUIDs: state.clustersUUIDs,
         isCompleted: state.isCompleted,
       }),
     }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "motion/react";
 import { useDocumentStore } from "@/stores/documentStore";
@@ -20,7 +20,6 @@ export const DocumentChunkingCard = () => {
     error: rtcError,
     initiateRtcChunking,
     chunkCount: rtcChunkCount,
-    chunksUUIDs: rtcChunksUUIDs,
   } = useRecursiveTokenChunkingStore();
 
   const {
@@ -29,14 +28,28 @@ export const DocumentChunkingCard = () => {
     isCompleted: cscIsCompleted,
     error: cscError,
     initiateCscChunking,
-    chunkCount: cscChunkCount,
-    chunksUUIDs: cscChunksUUIDs,
+    clusterCount: cscClusterCount,
+    clustersUUIDs,
   } = useClusterSemanticChunkingStore();
+
+  // 1. Khi upload xong -> chạy RTC lần đầu
+  useEffect(() => {
+    if (isDocumentUploadCompleted && !rtcIsCompleted) {
+      initiateRtcChunking(normalizedDocumentName);
+    }
+  }, [isDocumentUploadCompleted, rtcIsCompleted]);
+
+  // 2. Khi RTC xong -> chạy CSC lần đầu
+  useEffect(() => {
+    if (rtcIsCompleted && !cscIsCompleted) {
+      initiateCscChunking();
+    }
+  }, [rtcIsCompleted, cscIsCompleted]);
 
   const wrapperClasses = `w-full max-w-[60%] mx-auto my-2.5 border p-4 rounded-sm transition-colors duration-200 ${
     rtcError || cscError
       ? "border-red-500 bg-red-50"
-      : rtcIsCompleted || cscIsCompleted
+      : rtcIsCompleted && cscIsCompleted
       ? "border-green-500 bg-green-50"
       : "border-zinc-300"
   }`;
@@ -44,7 +57,15 @@ export const DocumentChunkingCard = () => {
   return (
     <div className={wrapperClasses}>
       <div className="grid gap-2.5">
-        <h2 className="text-lg font-bold">Document Chunking</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-bold">Document Chunking</h2>
+          {rtcIsLoading || cscIsLoading ? (
+            <Loader2 className="animate-spin w-4 h-4 text-zinc-500" />
+          ) : rtcIsCompleted && cscIsCompleted ? (
+            <Check className="w-4 h-4 text-green-600" />
+          ) : null}
+        </div>
+
         <p className="text-sm text-zinc-500 italic">
           *Description: Normalized document will be chunked into pieces with
           maximum length of 200 tokens using Recursive Token Chunking technique.
@@ -83,7 +104,8 @@ export const DocumentChunkingCard = () => {
                     <h3 className="font-semibold mb-2">
                       Recursive Token Chunking Information
                     </h3>
-                    {rtcMessage && rtcChunkCount && rtcChunksUUIDs ? (
+                    {/* {rtcMessage && rtcChunkCount && rtcChunksUUIDs ? ( */}
+                    {rtcMessage ? (
                       <div className="text-sm text-zinc-700 space-y-1">
                         <p>
                           <strong>Chunk count:</strong> {rtcChunkCount}
@@ -91,20 +113,6 @@ export const DocumentChunkingCard = () => {
                         <p>
                           <strong>Response message:</strong> {rtcMessage}
                         </p>
-                        <div className="mt-2">
-                          <strong>Chunks UUIDs:</strong>
-                          <ul className="list-disc list-inside space-y-1 mt-1">
-                            {rtcChunksUUIDs.map((uuid) => (
-                              <li
-                                key={uuid}
-                                className="font-mono text-xs bg-zinc-100 p-1 rounded cursor-pointer hover:bg-zinc-200 transition"
-                                title="Click to copy"
-                              >
-                                {uuid}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
                       </div>
                     ) : (
                       <p className="text-sm text-zinc-500 italic">
@@ -126,28 +134,37 @@ export const DocumentChunkingCard = () => {
                     <h3 className="font-semibold mb-2">
                       Cluster Semantic Chunking Information
                     </h3>
-                    {cscMessage && cscChunkCount && cscChunksUUIDs ? (
+                    {/* {cscMessage && cscChunkCount && cscChunksUUIDs ? ( */}
+                    {cscMessage ? (
                       <div className="text-sm text-zinc-700 space-y-1">
                         <p>
-                          <strong>Chunk count:</strong> {cscChunkCount}
+                          <strong>Cluster count:</strong> {cscClusterCount}
                         </p>
                         <p>
                           <strong>Response message:</strong> {cscMessage}
                         </p>
-                        <div className="mt-2">
-                          <strong>Chunks UUIDs:</strong>
-                          <ul className="list-disc list-inside space-y-1 mt-1">
-                            {cscChunksUUIDs.map((uuid) => (
-                              <li
-                                key={uuid}
-                                className="font-mono text-xs bg-zinc-100 p-1 rounded cursor-pointer hover:bg-zinc-200 transition"
-                                title="Click to copy"
-                              >
-                                {uuid}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                        {clustersUUIDs && clustersUUIDs.length > 0 ? (
+                          <div className="mt-4 space-y-2">
+                            <h3 className="font-semibold mb-2">
+                              Cluster UUIDs:
+                            </h3>
+
+                            <div className="max-h-48 overflow-y-auto pr-1 space-y-2">
+                              {clustersUUIDs.map(
+                                (id: string, index: number) => (
+                                  <div
+                                    key={id}
+                                    className="flex items-center justify-between border rounded-md px-3 py-2 bg-white shadow-sm"
+                                  >
+                                    <span className="text-xs font-mono text-zinc-700">
+                                      {index + 1}. {id}
+                                    </span>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
                     ) : (
                       <p className="text-sm text-zinc-500 italic">

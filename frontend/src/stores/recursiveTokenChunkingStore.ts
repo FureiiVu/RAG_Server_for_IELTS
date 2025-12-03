@@ -45,10 +45,12 @@ export const useRecursiveTokenChunkingStore = create<documentStore>()(
             }
           );
 
+          const chunksUUIDs = rtcResponse.data?.chunksUUIDS ?? {};
+
           set({
             message: rtcResponse.data.message,
             chunkCount: rtcResponse.data.chunkCount,
-            chunksUUIDs: rtcResponse.data.chunksUUIDs,
+            chunksUUIDs: Object.values(chunksUUIDs),
             isCompleted: true,
           });
         } catch (error: any) {
