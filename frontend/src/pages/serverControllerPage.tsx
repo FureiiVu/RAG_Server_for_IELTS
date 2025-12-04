@@ -8,6 +8,7 @@ import { useDocumentStore } from "@/stores/documentStore";
 import { useRecursiveTokenChunkingStore } from "@/stores/recursiveTokenChunkingStore";
 import { useClusterSemanticChunkingStore } from "@/stores/clusterSemanticChunkingStore";
 import { useRetrievalStore } from "@/stores/retrievalStore";
+import { useDeleteClustersStore } from "@/stores/deleteClustersStore";
 
 const ServerControllerPage = () => {
   const { cleanStore: cleanDocumentStore } = useDocumentStore();
@@ -16,6 +17,7 @@ const ServerControllerPage = () => {
   const { cleanStore: cleanClusterSemanticChunkingStore } =
     useClusterSemanticChunkingStore();
   const { cleanStore: cleanRetrievalStore } = useRetrievalStore();
+  const { cleanStore: cleanDeleteClustersStore } = useDeleteClustersStore();
 
   const cleanAllStores = () => {
     cleanDocumentStore();
@@ -28,7 +30,7 @@ const ServerControllerPage = () => {
     useClusterSemanticChunkingStore.persist.clearStorage();
 
     cleanRetrievalStore();
-    useRetrievalStore.persist.clearStorage();
+    cleanDeleteClustersStore();
   };
 
   return (

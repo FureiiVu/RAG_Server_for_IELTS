@@ -1,5 +1,4 @@
 import weaviateClient from "../config/connectDB.js";
-import { vectors, dataType } from "weaviate-client";
 
 export const insertChunksToWeaviate = async (collectionName, chunkData) => {
   try {

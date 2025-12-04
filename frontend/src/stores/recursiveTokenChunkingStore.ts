@@ -56,8 +56,7 @@ export const useRecursiveTokenChunkingStore = create<documentStore>()(
         } catch (error: any) {
           set({
             error:
-              error.response?.data?.message ||
-              "Recursive Token Chunking failed",
+              error.response?.data?.error || "Recursive Token Chunking failed",
           });
         } finally {
           set({ isLoading: false });

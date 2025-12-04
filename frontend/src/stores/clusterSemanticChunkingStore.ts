@@ -43,8 +43,7 @@ export const useClusterSemanticChunkingStore = create<documentStore>()(
         } catch (error: any) {
           set({
             error:
-              error.response?.data?.message ||
-              "Cluster Semantic Chunking failed",
+              error.response?.data?.error || "Cluster Semantic Chunking failed",
           });
         } finally {
           set({ isLoading: false });

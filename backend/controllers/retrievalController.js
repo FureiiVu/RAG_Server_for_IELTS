@@ -4,6 +4,7 @@ import { Filters } from "weaviate-client";
 
 import weaviateClient from "../config/connectDB.js";
 import { requestPrompt } from "../promts/requestPromt.js";
+import { deleteCollection } from "../middleware/crudWeaviate.js";
 
 dotenv.config();
 
@@ -98,8 +99,8 @@ export const getClustersInDuration = async (req, res) => {
     const collection = weaviateClient.collections.get("FinalChunksCollection");
     const clusters = await collection.query.fetchObjects({
       filters: Filters.and(
-        collection.filter.byCreationTime().greaterThanEqual(startDate),
-        collection.filter.byCreationTime().lessThanEqual(endDate)
+        collection.filter.byCreationTime().greaterOrEqual(startDate),
+        collection.filter.byCreationTime().lessOrEqual(endDate)
       ),
     });
 
@@ -109,6 +110,18 @@ export const getClustersInDuration = async (req, res) => {
     res.status(200).json({
       message: "Clusters retrieved successfully",
       clustersUUIDs: resultList,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteAllClusters = async (req, res) => {
+  try {
+    await deleteCollection("FinalChunksCollection");
+
+    res.status(200).json({
+      message: "All clusters have been deleted successfully",
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

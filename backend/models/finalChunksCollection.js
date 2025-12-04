@@ -9,6 +9,7 @@ const createFinalChunksCollection = async () => {
       description: "A final collection for storing chunks.",
       vectorizers: vectors.text2VecWeaviate(),
       properties: [{ name: "text", dataType: dataType.TEXT }],
+      invertedIndex: { indexTimestamps: true },
     });
     console.log("[INFO] FinalChunksCollection created successfully");
   } catch (error) {

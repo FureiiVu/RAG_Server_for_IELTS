@@ -30,7 +30,14 @@ export const GetClusterContentCard = () => {
   return (
     <div className={wrapperClasses}>
       <div className="grid gap-2.5">
-        <h2 className="text-lg font-bold">Check cluster content</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-bold">Check cluster content</h2>
+          {isLoading ? (
+            <Loader2 className="animate-spin w-4 h-4 text-zinc-500" />
+          ) : isCompleted ? (
+            <Check className="w-4 h-4 text-green-600" />
+          ) : null}
+        </div>
 
         <div>
           <Label htmlFor="cluster-id" className="font-semibold mb-2">
@@ -40,17 +47,8 @@ export const GetClusterContentCard = () => {
           <div className="flex justify-between space-x-2.5">
             <Input id="cluster-id" type="text" onChange={handleInputChange} />
 
-            <Button
-              onClick={handleGetContent}
-              disabled={isLoading || isCompleted}
-            >
-              {isLoading ? (
-                <Loader2 className="animate-spin w-4 h-4" />
-              ) : isCompleted ? (
-                <Check className="w-4 h-4 text-green-600" />
-              ) : (
-                "Check"
-              )}
+            <Button onClick={handleGetContent} disabled={isLoading}>
+              Check
             </Button>
           </div>
         </div>

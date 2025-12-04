@@ -51,7 +51,7 @@ export const useDocumentStore = create<documentStore>()(
           });
         } catch (error: any) {
           set({
-            error: error.response?.data?.message || "Upload failed",
+            error: error.response?.data?.error || "Upload failed",
           });
         } finally {
           set({ isLoading: false });
