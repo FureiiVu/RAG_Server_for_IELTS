@@ -30,7 +30,7 @@ export const DeleteClustersCard = () => {
       ? "border-red-500 bg-red-50"
       : isCompleted
       ? "border-green-500 bg-green-50"
-      : "border-zinc-300"
+      : "border-zinc-300 bg-white"
   }`;
 
   const handleTextareaChange = (ids: string) => {
@@ -102,16 +102,16 @@ export const DeleteClustersCard = () => {
         <div className="flex justify-between space-x-2.5">
           <Button
             variant="secondary"
-            className="flex-1"
+            className="flex-1 bg-[#F5F5F5] border hover:bg-zinc-200"
             onClick={() => setIsOpen(!isOpen)}
           >
-            {isOpen ? "Close ID Filter" : "Show ID Filter"}
+            {isOpen ? "Close Filter" : "Show Filter"}
           </Button>
 
           <Button
             onClick={handleDeleteClusters}
             disabled={isLoading}
-            className="flex-1"
+            className="flex-1 hover:bg-[#FF5C5C]"
             variant="destructive"
           >
             Delete
@@ -160,7 +160,7 @@ export const DeleteClustersCard = () => {
                 <Button
                   onClick={handleFilterClusterIDs}
                   disabled={isLoading}
-                  className="w-full mb-2"
+                  className="w-full mb-2 bg-[#192841] hover:bg-[#2A3E69]"
                 >
                   Filter IDs
                 </Button>

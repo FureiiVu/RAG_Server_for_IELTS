@@ -34,19 +34,36 @@ const ServerControllerPage = () => {
   };
 
   return (
-    <>
-      <FileUploadInput />
-      <DocumentChunkingCard />
-      <GetClusterContentCard />
-      <DeleteClustersCard />
-
-      <div className="w-full max-w-[60%] mx-auto my-2.5 flex justify-end space-x-2.5">
-        <Button variant="secondary" className="px-8" onClick={cleanAllStores}>
-          Upload new file
-        </Button>
-        <Button className="px-8">Evaluate server</Button>
+    <div className="min-h-screen w-full bg-[#192841] py-10 px-6">
+      {/* Header */}
+      <div className="w-full max-w-5xl mx-auto mb-10 text-center">
+        <h1 className="text-4xl font-bold tracking-wide text-white mb-2">
+          RAG Server Controller
+        </h1>
+        <p className="text-gray-400 text-lg">
+          Manage your RAG processing pipeline with a clean and modern interface
+        </p>
       </div>
-    </>
+
+      {/* Main content container */}
+      <div className="w-full space-y-6">
+        <FileUploadInput />
+        <DocumentChunkingCard />
+        <GetClusterContentCard />
+        <DeleteClustersCard />
+
+        {/* Buttons */}
+        <div className="w-full flex justify-end max-w-[60%] mx-auto space-x-3 pt-4">
+          <Button
+            variant="secondary"
+            className="px-8 bg-[#3D4C66] text-white hover:bg-[#4A5A78]"
+            onClick={cleanAllStores}
+          >
+            Upload new file
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 

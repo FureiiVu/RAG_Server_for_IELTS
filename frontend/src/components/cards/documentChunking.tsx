@@ -51,7 +51,7 @@ export const DocumentChunkingCard = () => {
       ? "border-red-500 bg-red-50"
       : rtcIsCompleted && cscIsCompleted
       ? "border-green-500 bg-green-50"
-      : "border-zinc-300"
+      : "border-zinc-300 bg-white"
   }`;
 
   return (
@@ -77,7 +77,7 @@ export const DocumentChunkingCard = () => {
 
         <Button
           variant="secondary"
-          className="mt-2"
+          className="mt-2 bg-[#F5F5F5] border hover:bg-zinc-200"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? "Hide Details" : "Show Details"}

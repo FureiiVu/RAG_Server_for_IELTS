@@ -35,7 +35,7 @@ export const FileUploadInput = () => {
       ? "border-red-500 bg-red-50"
       : isCompleted
       ? "border-green-500 bg-green-50"
-      : "border-zinc-300"
+      : "border-zinc-300 bg-white"
   }`;
 
   return (
@@ -53,7 +53,11 @@ export const FileUploadInput = () => {
             onChange={handleFileChange}
           />
 
-          <Button onClick={handleUpload} disabled={isLoading || isCompleted}>
+          <Button
+            onClick={handleUpload}
+            disabled={isLoading || isCompleted}
+            className="bg-[#192841] hover:bg-[#2A3E69]"
+          >
             {isLoading ? (
               <Loader2 className="animate-spin w-4 h-4" />
             ) : isCompleted ? (
@@ -65,12 +69,13 @@ export const FileUploadInput = () => {
         </div>
 
         <p className="text-sm text-zinc-500 italic">
-          *Note: Only PDF, DOC, and DOCX files are supported.
+          *Note: Only PDF, DOC, and DOCX files are supported. The maximum
+          allowed file size is 10MB.
         </p>
 
         <Button
           variant="secondary"
-          className="mt-2"
+          className="mt-2 bg-[#F5F5F5] border hover:bg-zinc-200"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? "Hide Details" : "Show Details"}

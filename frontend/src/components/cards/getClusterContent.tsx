@@ -24,7 +24,7 @@ export const GetClusterContentCard = () => {
       ? "border-red-500 bg-red-50"
       : isCompleted
       ? "border-green-500 bg-green-50"
-      : "border-zinc-300"
+      : "border-zinc-300 bg-white"
   }`;
 
   return (
@@ -47,7 +47,11 @@ export const GetClusterContentCard = () => {
           <div className="flex justify-between space-x-2.5">
             <Input id="cluster-id" type="text" onChange={handleInputChange} />
 
-            <Button onClick={handleGetContent} disabled={isLoading}>
+            <Button
+              onClick={handleGetContent}
+              disabled={isLoading}
+              className="bg-[#192841] hover:bg-[#2A3E69]"
+            >
               Check
             </Button>
           </div>
