@@ -1,0 +1,46 @@
+/* assessment-response.css */
+
+.assessment-response {
+  font-family: "Inter", sans-serif;
+  color: #1f2937; /* gray-800 */
+  line-height: 1.6;
+}
+
+/* Titles */
+.assessment-response h1,
+.assessment-response h2,
+.assessment-response h3 {
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+/* Paragraph */
+.assessment-response p {
+  margin-bottom: 0.75rem;
+}
+
+/* Bullet points */
+.assessment-response ul {
+  margin-left: 1.5rem;
+  list-style-type: disc;
+}
+
+/* Code-style blocks */
+.assessment-response pre {
+  background: #f3f4f6;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+/* Highlight note */
+.assessment-response .note {
+  background: #fff7d6;
+  border-left: 4px solid #fbbf24;
+  padding: 12px 16px;
+  margin: 12px 0;
+  border-radius: 4px;
+  font-style: italic;
+}
